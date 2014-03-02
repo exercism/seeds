@@ -1,6 +1,8 @@
 class Exercise
-  def self.random(db)
-    exercise = db[:user_exercises].limit(1, rand(db[:user_exercises].count)).first
+  def self.random(db, language=nil)
+    query = db[:user_exercises]
+    query = query.where(language: language) if language
+    exercise = query.limit(1, rand(query.count)).first
     submissions = db[:submissions].where(user_exercise_id: exercise[:id]).all
     [exercise, submissions]
   end
