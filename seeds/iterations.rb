@@ -7,6 +7,10 @@ class Iterations
     @submissions = submissions
   end
 
+  def to_h
+    {language: exercise[:language], slug: exercise[:slug], user_id: user.id}
+  end
+
   def timestamps
     @timestamps ||= Sequence.random(submissions.length+1, user.at)
   end
