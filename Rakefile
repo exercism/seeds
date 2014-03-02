@@ -11,19 +11,14 @@ namespace :seeds do
 
     bob = User.new('bob').save_to(seeds)
     100.times do
-      iterations = Iterations.new(bob, *Exercise.random(dev))
-      if seeds[:user_exercises].where(iterations.to_h).count == 0
-        iterations.save_to(seeds)
-      end
+      Iterations.new(bob, *Exercise.random(dev)).save_to(seeds)
     end
 
     User.new('charlie', mastery: ['ruby'].to_yaml).save_to(seeds)
+
     diana = User.new('diana', mastery: ['javascript'].to_yaml).save_to(seeds)
     15.times do
-      iterations = Iterations.new(diana, *Exercise.random(dev, 'javascript'))
-      if seeds[:user_exercises].where(iterations.to_h).count == 0
-        iterations.save_to(seeds)
-      end
+      Iterations.new(diana, *Exercise.random(dev, 'javascript')).save_to(seeds)
     end
 
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
