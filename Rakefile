@@ -6,7 +6,8 @@ namespace :seeds do
 
     db = Sequel.connect('postgres://exercism:@localhost/exercism_seeds')
 
-    User.create(db, 'alice', mastery: Languages.all.to_yaml)
+    User.new('alice', mastery: Languages.all.to_yaml).save_to(db)
+
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
   end
 end

@@ -1,13 +1,23 @@
-module User
-  def self.create(db, username, attributes={})
-    attributes = default(username, Timestamp.random).merge(attributes)
-    db[:users].insert(attributes)
+class User
+  attr_reader :at, :username, :attributes, :id
+
+  def initialize(username, attributes={})
+    @at = Timestamp.random
+    @username = username
+    @attributes = default_attributes.update(attributes)
   end
 
-  def self.default(username, at)
+  def save_to(db)
+    @id = db[:users].insert(attributes)
+    self
+  end
+
+  private
+
+  def default_attributes
     {
       username: username,
-      key: Key.generate,
+      key: Key.user,
       github_id: GitHub.id,
       created_at: at,
       updated_at: at
