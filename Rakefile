@@ -14,7 +14,7 @@ namespace :seeds do
       Iterations.new(bob, *Exercise.random(dev)).save_to(seeds)
     end
 
-    User.new('charlie', mastery: ['ruby'].to_yaml).save_to(seeds)
+    charlie = User.new('charlie', mastery: ['ruby'].to_yaml).save_to(seeds)
 
     diana = User.new('diana', mastery: ['javascript'].to_yaml).save_to(seeds)
     15.times do
@@ -25,6 +25,25 @@ namespace :seeds do
     15.times do
       Iterations.new(eve, *Exercise.random(dev, 'haskell')).save_to(seeds)
     end
+
+    rugrats = Team.new('rugrats', seeds).save
+    rugrats.managed_by charlie
+
+    ['rachel', 'russ', 'rita', 'rolf', 'randall', 'river', 'rick'].each do |username|
+      user = User.new(username).save_to(seeds)
+      20.times do
+        Iterations.new(user, *Exercise.random(dev, 'ruby')).save_to(seeds)
+      end
+      rugrats.add user
+    end
+    rudi = User.new('rudi').save_to(seeds)
+    rugrats.add rudi
+
+    ryan = User.new('ryan').save_to(seeds)
+    20.times do
+      Iterations.new(ryan, *Exercise.random(dev, 'ruby')).save_to(seeds)
+    end
+    rugrats.invite ryan
 
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
   end
