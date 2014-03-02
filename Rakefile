@@ -17,6 +17,8 @@ namespace :seeds do
       end
     end
 
+    User.new('charlie', mastery: ['ruby'].to_yaml).save_to(seeds)
+
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
   end
 end
