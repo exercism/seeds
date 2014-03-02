@@ -21,6 +21,11 @@ namespace :seeds do
       Iterations.new(diana, *Exercise.random(dev, 'javascript')).save_to(seeds)
     end
 
+    eve = User.new('eve', mastery: ['python'].to_yaml).save_to(seeds)
+    15.times do
+      Iterations.new(eve, *Exercise.random(dev, 'haskell')).save_to(seeds)
+    end
+
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
   end
 end
