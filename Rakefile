@@ -78,7 +78,7 @@ namespace :seeds do
 
     motley = Team.new('motley', seeds).save
     motley.managed_by bob
-    [bob, mary, morris, madison, mildred, mack, mike, mitchell, marshall].each do |user|
+    [bob, rachel, mary, morris, madison, mildred, mack, mike, mitchell, marshall].each do |user|
       motley.add user
     end
 
@@ -94,11 +94,16 @@ namespace :seeds do
     [
       amelie, beth, claire, dawson, elisa, frederique, grace, haley,
       isaac, jarrod, kieran, lisa, mia, norma, opal, paula, quentin,
-      ruben, shaina, talia, ursula, vince, wilson, xavier, yvette,
-      zachary
+      rachel, ruben, shaina, talia, ursula, vince, wilson, xavier,
+      yvette, zachary
     ].each do |user|
       slate.add user
     end
+
+    polkadots = Team.new('polkadots', seeds).save
+    polkadots.managed_by bob
+    polkadots.add rudi
+    polkadots.add rachel
 
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
   end
