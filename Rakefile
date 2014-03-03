@@ -75,12 +75,14 @@ namespace :seeds do
 
     ghost = Team.new('ghost', seeds).save
     ghost.managed_by alice
+    ghost.invite ruben
 
     motley = Team.new('motley', seeds).save
     motley.managed_by bob
     [bob, rachel, mary, morris, madison, mildred, mack, mike, mitchell, marshall].each do |user|
       motley.add user
     end
+    motley.invite ruben
 
     rugrats = Team.new('rugrats', seeds).save
     rugrats.managed_by charlie
@@ -88,6 +90,7 @@ namespace :seeds do
       rugrats.add user
     end
     rugrats.invite ryan
+    rugrats.invite ruben
 
     slate = Team.new('slate', seeds).save
     slate.managed_by bob
@@ -104,6 +107,7 @@ namespace :seeds do
     polkadots.managed_by bob
     polkadots.add rudi
     polkadots.add rachel
+    polkadots.invite ruben
 
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
   end
