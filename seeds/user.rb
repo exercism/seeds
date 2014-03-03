@@ -12,6 +12,12 @@ class User
     self
   end
 
+  def submit(n, source_db, destination_db, language=nil)
+    20.times do
+      Iterations.new(self, *Exercise.random(source_db, language)).save_to(destination_db)
+    end
+  end
+
   private
 
   def default_attributes
