@@ -59,6 +59,27 @@ namespace :seeds do
     end
     rugrats.invite ryan
 
+    slate = Team.new('slate', seeds).save
+    slate.managed_by bob
+
+    [
+      "amelie", "beth", "claire",
+      "dawson", "elisa", "frederique",
+      "grace", "haley", "isaac",
+      "jarrod", "kieran", "lisa",
+      "mia", "norma", "opal",
+      "paula", "quentin", "ruben",
+      "shaina", "talia", "ursula",
+      "vince", "wilson", "xavier",
+      "yvette", "zachary"
+    ].each do |username|
+      user = User.new(username).save_to(seeds)
+      20.times do
+        Iterations.new(user, *Exercise.random(dev)).save_to(seeds)
+      end
+      slate.add user
+    end
+
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
   end
 end
