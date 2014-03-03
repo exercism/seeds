@@ -28,6 +28,18 @@ namespace :seeds do
       Iterations.new(eve, *Exercise.random(dev, 'haskell')).save_to(seeds)
     end
 
+    motley = Team.new('motley', seeds).save
+    motley.managed_by bob
+    motley.add bob
+
+    ['mary', 'morris', 'madison', 'mildred', 'mack', 'mike', 'mitchell', 'marshall'].each do |username|
+      user = User.new(username).save_to(seeds)
+      20.times do
+        Iterations.new(user, *Exercise.random(dev)).save_to(seeds)
+      end
+      motley.add user
+    end
+
     rugrats = Team.new('rugrats', seeds).save
     rugrats.managed_by charlie
 
