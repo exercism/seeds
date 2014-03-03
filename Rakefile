@@ -7,7 +7,9 @@ namespace :seeds do
     dev = Sequel.connect('postgres://exercism:@localhost/exercism_development')
     seeds = Sequel.connect('postgres://exercism:@localhost/exercism_seeds')
 
-    User.new('alice', mastery: Languages.all.to_yaml).save_to(seeds)
+    alice = User.new('alice', mastery: Languages.all.to_yaml).save_to(seeds)
+    ghost = Team.new('ghost', seeds).save
+    ghost.managed_by alice
 
     bob = User.new('bob').save_to(seeds)
     100.times do
