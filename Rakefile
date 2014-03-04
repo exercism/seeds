@@ -73,24 +73,50 @@ namespace :seeds do
       user.submit(20, dev, seeds, 'ruby')
     end
 
+
+    baconesia = Team.new('baconesia', seeds).save
+    baconesia.managed_by alice
+    baconesia.managed_by bob
+    baconesia.managed_by charlie
+    [mary, isaac, lisa, mia, elisa, claire, beth, paula, quentin, river].each do |user|
+      baconesia.add user
+    end
+    [jarrod, kieran, opal, rachel, ruben, shaina, talia, xavier].each do |user|
+      baconesia.invite user
+    end
+
+    chocolades = Team.new('chocolades', seeds).save
+    chocolades.managed_by alice
+    [bob, river, quentin, xavier].each do |user|
+      chocolades.add user
+    end
+    [mack, ruben].each do |user|
+      chocolades.invite user
+    end
+
     ghost = Team.new('ghost', seeds).save
     ghost.managed_by alice
     ghost.invite ruben
+    ghost.invite bob
 
     motley = Team.new('motley', seeds).save
+    motley.managed_by alice
     motley.managed_by bob
     [bob, rachel, mary, morris, madison, mildred, mack, mike, mitchell, marshall].each do |user|
       motley.add user
     end
-    motley.invite ruben
+    [ruben, frederique, haley].each do |user|
+      motley.invite user
+    end
 
     rugrats = Team.new('rugrats', seeds).save
     rugrats.managed_by charlie
     [rachel, russ, rita, rolf, randall, river, rick, rudi].each do |user|
       rugrats.add user
     end
-    rugrats.invite ryan
-    rugrats.invite ruben
+    [ryan, ruben, bob].each do |user|
+      rugrats.invite user
+    end
 
     slate = Team.new('slate', seeds).save
     slate.managed_by bob
@@ -105,8 +131,9 @@ namespace :seeds do
 
     polkadots = Team.new('polkadots', seeds).save
     polkadots.managed_by bob
-    polkadots.add rudi
-    polkadots.add rachel
+    [bob, rudi, rachel].each do |user|
+      polkadots.add user
+    end
     polkadots.invite ruben
 
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
