@@ -1,9 +1,9 @@
 class Exercise
-  def self.random(db, language=nil)
-    query = db[:user_exercises]
+  def self.random(language=nil)
+    query = SOURCE[:user_exercises]
     query = query.where(language: language) if language
     exercise = query.limit(1, rand(query.count)).first
-    submissions = db[:submissions].where(user_exercise_id: exercise[:id]).all
+    submissions = SOURCE[:submissions].where(user_exercise_id: exercise[:id]).all
     [exercise, submissions]
   end
 
@@ -14,10 +14,10 @@ class Exercise
     @attributes = attributes
   end
 
-  def save_to(db)
+  def save
     attributes.delete(:id)
     attributes.update(overrides)
-    @id = db[:user_exercises].insert(attributes)
+    @id = TARGET[:user_exercises].insert(attributes)
     self
   end
 

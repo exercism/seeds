@@ -7,10 +7,10 @@ class Submission
     @attributes = attributes
   end
 
-  def save_to(db)
+  def save
     attributes.delete(:id)
     attributes.update(overrides)
-    @id = db[:submissions].insert(attributes)
+    @id = TARGET[:submissions].insert(attributes)
     self
   end
 

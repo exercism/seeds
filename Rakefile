@@ -4,9 +4,6 @@ namespace :seeds do
     require_relative 'seeds'
     Reset.hard
 
-    dev = Sequel.connect('postgres://exercism:@localhost/exercism_development')
-    seeds = Sequel.connect('postgres://exercism:@localhost/exercism_seeds')
-
     alice = User.create('alice', mastery: Languages.all.to_yaml)
     amelie = User.create('amelie')
     beth = User.create('beth')
@@ -57,9 +54,9 @@ namespace :seeds do
     yvette = User.create('yvette')
     zachary = User.create('zachary')
 
-    bob.submit(100, dev, seeds)
-    diana.submit(15, dev, seeds, 'javascript')
-    eve.submit(15, dev, seeds, 'haskell')
+    bob.submit(100)
+    diana.submit(15, 'javascript')
+    eve.submit(15, 'haskell')
     [
       mary, morris, madison, mildred, mack, mike, mitchell, marshall,
       amelie, beth, claire, dawson, elisa, frederique, grace, haley,
@@ -67,14 +64,14 @@ namespace :seeds do
       ruben, shaina, talia, ursula, vince, wilson, xavier, yvette,
       zachary
     ].each do |user|
-      user.submit(20, dev, seeds)
+      user.submit(20)
     end
     [rachel, russ, rita, rolf, randall, river, rick, ryan].each do |user|
-      user.submit(20, dev, seeds, 'ruby')
+      user.submit(20, 'ruby')
     end
 
 
-    baconesia = Team.new('baconesia', seeds).save
+    baconesia = Team.new('baconesia').save
     baconesia.managed_by alice
     baconesia.managed_by bob
     baconesia.managed_by charlie
@@ -85,7 +82,7 @@ namespace :seeds do
       baconesia.invite user
     end
 
-    chocolades = Team.new('chocolades', seeds).save
+    chocolades = Team.new('chocolades').save
     chocolades.managed_by alice
     [bob, river, quentin, xavier].each do |user|
       chocolades.add user
@@ -94,12 +91,12 @@ namespace :seeds do
       chocolades.invite user
     end
 
-    ghost = Team.new('ghost', seeds).save
+    ghost = Team.new('ghost').save
     ghost.managed_by alice
     ghost.invite ruben
     ghost.invite bob
 
-    motley = Team.new('motley', seeds).save
+    motley = Team.new('motley').save
     motley.managed_by alice
     motley.managed_by bob
     [bob, rachel, mary, morris, madison, mildred, mack, mike, mitchell, marshall].each do |user|
@@ -109,7 +106,7 @@ namespace :seeds do
       motley.invite user
     end
 
-    rugrats = Team.new('rugrats', seeds).save
+    rugrats = Team.new('rugrats').save
     rugrats.managed_by charlie
     [rachel, russ, rita, rolf, randall, river, rick, rudi].each do |user|
       rugrats.add user
@@ -118,7 +115,7 @@ namespace :seeds do
       rugrats.invite user
     end
 
-    slate = Team.new('slate', seeds).save
+    slate = Team.new('slate').save
     slate.managed_by bob
     [
       amelie, beth, claire, dawson, elisa, frederique, grace, haley,
@@ -129,7 +126,7 @@ namespace :seeds do
       slate.add user
     end
 
-    polkadots = Team.new('polkadots', seeds).save
+    polkadots = Team.new('polkadots').save
     polkadots.managed_by bob
     [bob, rudi, rachel].each do |user|
       polkadots.add user

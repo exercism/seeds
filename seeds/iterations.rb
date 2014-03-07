@@ -11,21 +11,21 @@ class Iterations
     {language: exercise[:language], slug: exercise[:slug], user_id: user.id}
   end
 
-  def already_in?(db)
-    db[:user_exercises].where(to_h).count > 0
+  def exists?
+    TARGET[:user_exercises].where(to_h).count > 0
   end
 
   def timestamps
     @timestamps ||= Sequence.random(submissions.length+1, user.at)
   end
 
-  def save_to(db)
-    return if already_in?(db)
+  def save
+    return if exists?
 
-    ex = Exercise.new(user, timestamps, exercise).save_to(db)
+    ex = Exercise.new(user, timestamps, exercise).save
 
     submissions.zip(timestamps).each do |submission, timestamp|
-      Submission.new(ex, timestamp, submission).save_to(db)
+      Submission.new(ex, timestamp, submission).save
     end
   end
 end

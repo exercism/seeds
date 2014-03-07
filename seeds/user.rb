@@ -10,9 +10,9 @@ class User < OpenStruct
     super(default_attributes.update(attributes))
   end
 
-  def submit(n, source_db, destination_db, language=nil)
+  def submit(n, language=nil)
     n.times do
-      Iterations.new(self, *Exercise.random(source_db, language)).save_to(destination_db)
+      Iterations.new(self, *Exercise.random(language)).save
     end
   end
 
