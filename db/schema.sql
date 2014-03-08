@@ -255,6 +255,124 @@ ALTER SEQUENCE notifications_id_seq OWNED BY notifications.id;
 
 
 --
+-- Name: posts; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE posts (
+    id integer NOT NULL,
+    slug character varying(255),
+    title character varying(255),
+    blurb text,
+    body text,
+    testimonial_keyword character varying(255),
+    event_on date,
+    archive_on date,
+    is_indestructible boolean,
+    is_featured boolean,
+    is_service boolean,
+    priority integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.posts OWNER TO exercism;
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE posts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.posts_id_seq OWNER TO exercism;
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE posts_id_seq OWNED BY posts.id;
+
+
+--
+-- Name: products; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE products (
+    id integer NOT NULL,
+    title character varying(255),
+    price character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    sort_order integer
+);
+
+
+ALTER TABLE public.products OWNER TO exercism;
+
+--
+-- Name: products_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE products_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.products_id_seq OWNER TO exercism;
+
+--
+-- Name: products_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE products_id_seq OWNED BY products.id;
+
+
+--
+-- Name: quotes; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE quotes (
+    id integer NOT NULL,
+    body text,
+    cite character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.quotes OWNER TO exercism;
+
+--
+-- Name: quotes_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE quotes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.quotes_id_seq OWNER TO exercism;
+
+--
+-- Name: quotes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE quotes_id_seq OWNED BY quotes.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -455,6 +573,46 @@ ALTER SEQUENCE teams_id_seq OWNED BY teams.id;
 
 
 --
+-- Name: testimonials; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE testimonials (
+    id integer NOT NULL,
+    body text,
+    name character varying(255),
+    about character varying(255),
+    homepage character varying(255),
+    keyword character varying(255),
+    featured boolean,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.testimonials OWNER TO exercism;
+
+--
+-- Name: testimonials_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE testimonials_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.testimonials_id_seq OWNER TO exercism;
+
+--
+-- Name: testimonials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE testimonials_id_seq OWNED BY testimonials.id;
+
+
+--
 -- Name: user_exercises; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -582,6 +740,27 @@ ALTER TABLE ONLY notifications ALTER COLUMN id SET DEFAULT nextval('notification
 -- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
 --
 
+ALTER TABLE ONLY posts ALTER COLUMN id SET DEFAULT nextval('posts_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
+ALTER TABLE ONLY products ALTER COLUMN id SET DEFAULT nextval('products_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
+ALTER TABLE ONLY quotes ALTER COLUMN id SET DEFAULT nextval('quotes_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
 ALTER TABLE ONLY submission_viewers ALTER COLUMN id SET DEFAULT nextval('submission_viewers_id_seq'::regclass);
 
 
@@ -611,6 +790,13 @@ ALTER TABLE ONLY team_memberships ALTER COLUMN id SET DEFAULT nextval('team_memb
 --
 
 ALTER TABLE ONLY teams ALTER COLUMN id SET DEFAULT nextval('teams_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
+ALTER TABLE ONLY testimonials ALTER COLUMN id SET DEFAULT nextval('testimonials_id_seq'::regclass);
 
 
 --
@@ -676,6 +862,30 @@ ALTER TABLE ONLY notifications
 
 
 --
+-- Name: posts_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY posts
+    ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: products_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY products
+    ADD CONSTRAINT products_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: quotes_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY quotes
+    ADD CONSTRAINT quotes_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: submission_viewers_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -713,6 +923,14 @@ ALTER TABLE ONLY team_memberships
 
 ALTER TABLE ONLY teams
     ADD CONSTRAINT teams_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: testimonials_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY testimonials
+    ADD CONSTRAINT testimonials_pkey PRIMARY KEY (id);
 
 
 --

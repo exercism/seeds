@@ -30,6 +30,7 @@ class Iterations
     return if exists?
 
     ex = Exercise.create(user, timestamps, exercise)
+    HibernationAlert.for(user, ex) if ex.hibernating?
 
     submissions.zip(timestamps).each do |submission, timestamp|
       Submission.new(ex, timestamp, submission).save
