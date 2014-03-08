@@ -23,7 +23,7 @@ class Iterations
   end
 
   def timestamps
-    @timestamps ||= Sequence.random(submissions.length+1, user.at)
+    @timestamps ||= Sequence.random(submissions.length+1, user.created_at)
   end
 
   def save
