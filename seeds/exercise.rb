@@ -1,4 +1,4 @@
-class Exercise
+class Exercise < OpenStruct
   def self.random(language=nil)
     query = SOURCE[:user_exercises]
     query = query.where(language: language) if language
@@ -7,22 +7,34 @@ class Exercise
     [exercise, submissions]
   end
 
-  attr_reader :user, :timestamps, :attributes, :id
-  def initialize(user, timestamps, attributes)
-    @user = user
-    @timestamps = timestamps
-    @attributes = attributes
+  def self.create(user, timestamps, attributes)
+    exercise = new(attributes.update(user: user, timestamps: timestamps))
+    id = TARGET[:user_exercises].insert(exercise.to_h)
+    exercise.id = id
+    exercise
   end
 
-  def save
-    attributes.delete(:id)
-    attributes.update(overrides)
-    @id = TARGET[:user_exercises].insert(attributes)
-    self
+  def to_h
+    {
+      user_id: user.id,
+      language: language,
+      slug: slug,
+      iteration_count: iteration_count,
+      state: state,
+      key: Key.exercise,
+      is_nitpicker: is_nitpicker,
+      created_at: created_at,
+      updated_at: updated_at,
+      completed_at: completed_at
+    }
+  end
+
+  def hibernating?
+    state == 'hibernating'
   end
 
   def done?
-    attributes[:state] == 'done'
+    state == 'done'
   end
 
   def created_at
@@ -30,20 +42,10 @@ class Exercise
   end
 
   def updated_at
-    done? ? timestamps.last : timestamps.first
+    done? || hibernating? ? timestamps.last : timestamps.first
   end
 
   def completed_at
     timestamps.last if done?
-  end
-
-  def overrides
-    {
-      user_id: user.id,
-      key: Key.exercise,
-      created_at: created_at,
-      completed_at: completed_at,
-      updated_at: updated_at
-    }
   end
 end

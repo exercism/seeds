@@ -29,7 +29,7 @@ class Iterations
   def save
     return if exists?
 
-    ex = Exercise.new(user, timestamps, exercise).save
+    ex = Exercise.create(user, timestamps, exercise)
 
     submissions.zip(timestamps).each do |submission, timestamp|
       Submission.new(ex, timestamp, submission).save
