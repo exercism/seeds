@@ -1,4 +1,11 @@
 class Iterations
+  def self.create(n, username, language=nil)
+    user = User.find(username)
+    n.times do
+      Iterations.new(user, *Exercise.random(language)).save
+    end
+  end
+
   attr_reader :user, :exercise, :submissions
 
   def initialize(user, exercise, submissions)

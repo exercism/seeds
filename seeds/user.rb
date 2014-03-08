@@ -6,14 +6,12 @@ class User < OpenStruct
     user
   end
 
-  def initialize(attributes)
-    super(default_attributes.update(attributes))
+  def self.find(username)
+    new(TARGET[:users].where(username: username).first)
   end
 
-  def submit(n, language=nil)
-    n.times do
-      Iterations.new(self, *Exercise.random(language)).save
-    end
+  def initialize(attributes)
+    super(default_attributes.update(attributes))
   end
 
   private
