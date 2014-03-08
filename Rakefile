@@ -70,67 +70,43 @@ namespace :seeds do
       user.submit(20, 'ruby')
     end
 
-
     baconesia = Team.new('baconesia').save
-    baconesia.managed_by alice
-    baconesia.managed_by bob
-    baconesia.managed_by charlie
-    [mary, isaac, lisa, mia, elisa, claire, beth, paula, quentin, river].each do |user|
-      baconesia.add user
-    end
-    [jarrod, kieran, opal, rachel, ruben, shaina, talia, xavier].each do |user|
-      baconesia.invite user
-    end
+    baconesia.managed_by alice, bob, charlie
+    baconesia.add mary, isaac, lisa, mia, elisa, claire, beth, paula, quentin, river
+    baconesia.invite jarrod, kieran, opal, rachel, ruben, shaina, talia, xavier
 
     chocolades = Team.new('chocolades').save
     chocolades.managed_by alice
-    [bob, river, quentin, xavier].each do |user|
-      chocolades.add user
-    end
-    [mack, ruben].each do |user|
-      chocolades.invite user
-    end
+    chocolades.add bob, river, quentin, xavier
+    chocolades.invite mack, ruben
 
     ghost = Team.new('ghost').save
     ghost.managed_by alice
-    ghost.invite ruben
-    ghost.invite bob
+    ghost.invite ruben, bob
 
     motley = Team.new('motley').save
-    motley.managed_by alice
-    motley.managed_by bob
-    [bob, rachel, mary, morris, madison, mildred, mack, mike, mitchell, marshall].each do |user|
-      motley.add user
-    end
-    [ruben, frederique, haley].each do |user|
-      motley.invite user
-    end
+    motley.managed_by alice, bob
+    motley.add bob, rachel, mary, morris, madison, mildred, mack, mike, mitchell, marshall
+    motley.invite ruben, frederique, haley
 
     rugrats = Team.new('rugrats').save
     rugrats.managed_by charlie
-    [rachel, russ, rita, rolf, randall, river, rick, rudi].each do |user|
-      rugrats.add user
-    end
-    [ryan, ruben, bob].each do |user|
-      rugrats.invite user
-    end
+    rugrats.add rachel, russ, rita, rolf, randall, river, rick, rudi
+    rugrats.invite ryan, ruben, bob
 
     slate = Team.new('slate').save
     slate.managed_by bob
-    [
+    members = [
       amelie, beth, claire, dawson, elisa, frederique, grace, haley,
       isaac, jarrod, kieran, lisa, mia, norma, opal, paula, quentin,
       rachel, ruben, shaina, talia, ursula, vince, wilson, xavier,
       yvette, zachary
-    ].each do |user|
-      slate.add user
-    end
+    ]
+    slate.add *members
 
     polkadots = Team.new('polkadots').save
     polkadots.managed_by bob
-    [bob, rudi, rachel].each do |user|
-      polkadots.add user
-    end
+    polkadots.add bob, rudi, rachel
     polkadots.invite ruben
 
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
