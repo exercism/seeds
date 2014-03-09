@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'sequel'
+gem 'faker'
 gem 'pg'
+gem 'sequel'

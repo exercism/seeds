@@ -1,3 +1,28 @@
+namespace :extract do
+  desc "Extract nitpicks into a file"
+  task :nitpicks do
+    require 'sequel'
+    require 'pg'
+    require 'faker'
+    I18n.enforce_available_locales = false
+
+    db = Sequel.connect('postgres://exercism:@localhost/exercism_development')
+
+    usernames = db["SELECT DISTINCT language FROM user_exercises"].map {|row| row[:language]}
+
+    languages = db["SELECT DISTINCT language FROM user_exercises"].map {|row| row[:language]}
+
+    languages.each do |language|
+      comments = db["SELECT comments.body FROM comments INNER JOIN submissions ON submissions.id=comments.submission_id WHERE submissions.language = '#{language}'"].map {|row| row[:body]}
+      File.open("nitpicks/#{language}.dat", 'w') do |file|
+        comments.each do |comment|
+          file.puts comment.gsub(/@\w+/, "@#{Faker::Name.first_name.downcase}")
+        end
+      end
+    end
+  end
+end
+
 namespace :seeds do
   desc "Generate seed data"
   task :generate do

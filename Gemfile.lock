@@ -1,6 +1,9 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    faker (1.2.0)
+      i18n (~> 0.5)
+    i18n (0.6.9)
     pg (0.17.1)
     sequel (4.8.0)
 
@@ -8,5 +11,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  faker
   pg
   sequel
