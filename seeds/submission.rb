@@ -2,7 +2,10 @@ class Submission < OpenStruct
 
   def self.create(attributes)
     attributes.delete(:id)
-    TARGET[:submissions].insert(new(attributes).to_h)
+    submission = new(attributes)
+    id = TARGET[:submissions].insert(submission.to_h)
+    submission.id = id
+    CodeNotifications.new(submission).process
   end
 
   def to_h
