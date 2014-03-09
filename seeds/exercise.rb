@@ -14,9 +14,13 @@ class Exercise < OpenStruct
     exercise
   end
 
+  def user_id
+    user.id
+  end
+
   def to_h
     {
-      user_id: user.id,
+      user_id: user_id,
       language: language,
       slug: slug,
       iteration_count: iteration_count,

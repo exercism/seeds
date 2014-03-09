@@ -1,25 +1,20 @@
-class Submission
-  attr_reader :exercise, :at, :attributes, :id
+class Submission < OpenStruct
 
-  def initialize(exercise, at, attributes)
-    @exercise = exercise
-    @at = at
-    @attributes = attributes
+  def self.create(attributes)
+    attributes.delete(:id)
+    TARGET[:submissions].insert(new(attributes).to_h)
   end
 
-  def save
-    attributes.delete(:id)
-    attributes.update(overrides)
-    @id = TARGET[:submissions].insert(attributes)
-    self
+  def to_h
+    super.to_h.update(overrides)
   end
 
   def overrides
     {
-      is_liked: nil, nit_count: 0, done_at: nil,
-      user_exercise_id: exercise.id, user_id: exercise.user.id,
-      created_at: at, updated_at: at,
-      key: Key.submission
+      key: Key.submission,
+      is_liked: false,
+      nit_count: 0,
+      done_at: nil
     }
   end
 end

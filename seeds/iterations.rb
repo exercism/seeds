@@ -33,7 +33,13 @@ class Iterations
     HibernationAlert.for(user, ex) if ex.hibernating?
 
     submissions.zip(timestamps).each do |submission, timestamp|
-      Submission.new(ex, timestamp, submission).save
+      attributes = {
+        user_exercise_id: ex.id,
+        user_id: ex.user_id,
+        created_at: timestamp,
+        updated_at: timestamp
+      }
+      Submission.create(submission.update(attributes))
     end
   end
 end
