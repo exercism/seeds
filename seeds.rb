@@ -1,3 +1,4 @@
+require 'ostruct'
 require 'yaml'
 require 'sequel'
 require 'pg'
