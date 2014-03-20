@@ -16,7 +16,11 @@ namespace :extract do
       comments = db["SELECT comments.body FROM comments INNER JOIN submissions ON submissions.id=comments.submission_id WHERE submissions.language = '#{language}'"].map {|row| row[:body]}
       File.open("nitpicks/#{language}.dat", 'w') do |file|
         comments.each do |comment|
-          file.puts comment.gsub(/@\w+/, "@#{Faker::Name.first_name.downcase}")
+          ivar = /@\w+/
+          fake_ivar = "@#{Faker::Name.first_name.downcase}"
+          code_block = /```.*?```\n/m
+          text = comment.gsub(ivar, fake_ivar).gsub(code_block, '')
+          file.puts text
         end
       end
     end
