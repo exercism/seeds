@@ -1,3 +1,14 @@
+namespace :generate do
+  desc "generate markov chains"
+  task :markov do
+    Dir.glob("./nitpicks/*dat").each do |infile|
+      language = infile[/([^\/]+)\.dat/, 1]
+      outfile = "./markov/#{language}.json"
+      system("bin/markov b -f #{infile} -o #{outfile}")
+    end
+  end
+end
+
 namespace :extract do
   desc "Extract nitpicks into a file"
   task :nitpicks do
