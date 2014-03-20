@@ -29,6 +29,6 @@ class TeamInvitation
   end
 
   def at
-    @at ||= Sequence.random(1, team.at).first
+    @at ||= Chronology.random(1, team.at).first
   end
 end

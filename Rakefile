@@ -44,7 +44,7 @@ namespace :seeds do
     require './lib/seeds'
     Reset.hard
 
-    alice = User.create('alice', mastery: Languages.all.to_yaml)
+    alice = User.create('alice', mastery: Curriculum.languages.to_yaml)
     charlie = User.create('charlie', mastery: ['ruby'].to_yaml)
     diana = User.create('diana', mastery: ['javascript'].to_yaml)
     eve = User.create('eve', mastery: ['python'].to_yaml)
@@ -60,9 +60,9 @@ namespace :seeds do
       User.create username
     end
 
-    Iterations.create(100, 'bob')
-    Iterations.create(15, 'diana', 'javascript')
-    Iterations.create(15, 'eve', 'haskell')
+    Sequence.create(100, 'bob')
+    Sequence.create(15, 'diana', 'javascript')
+    Sequence.create(15, 'eve', 'haskell')
     [
       'mary', 'morris', 'madison', 'mildred', 'mack', 'mike', 'mitchell', 'marshall',
       'amelie', 'beth', 'claire', 'dawson', 'elisa', 'frederique', 'grace', 'haley',
@@ -70,10 +70,10 @@ namespace :seeds do
       'ruben', 'shaina', 'talia', 'ursula', 'vince', 'wilson', 'xavier', 'yvette',
       'zachary'
     ].each do |username|
-      Iterations.create(20, username)
+      Sequence.create(20, username)
     end
     ['rachel', 'russ', 'rita', 'rolf', 'randall', 'river', 'rick', 'ryan'].each do |username|
-      Iterations.create(20, username, 'ruby')
+      Sequence.create(20, username, 'ruby')
     end
 
     baconesia = Team.new('baconesia').save

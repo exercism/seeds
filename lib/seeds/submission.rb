@@ -5,7 +5,7 @@ class Submission < OpenStruct
     submission = new(attributes)
     id = TARGET[:submissions].insert(submission.to_h)
     submission.id = id
-    CodeNotifications.new(submission).process
+    Notification.process(submission)
   end
 
   def to_h

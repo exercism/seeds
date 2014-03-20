@@ -1,5 +1,5 @@
-module Languages
-  def self.all
+module Curriculum
+  def self.languages
     [
       'clojure',
       'coffeescript',
