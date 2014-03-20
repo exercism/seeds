@@ -41,7 +41,7 @@ end
 namespace :seeds do
   desc "Generate seed data"
   task :generate do
-    require_relative 'seeds'
+    require './lib/seeds'
     Reset.hard
 
     alice = User.create('alice', mastery: Languages.all.to_yaml)
