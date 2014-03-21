@@ -115,6 +115,10 @@ namespace :seeds do
     polkadots.add 'bob', 'rudi', 'rachel'
     polkadots.invite 'ruben'
 
+    TARGET[:submissions].all.each do |attributes|
+      Comment.on(Submission.new(attributes))
+    end
+
     system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
   end
 end
