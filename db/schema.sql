@@ -178,6 +178,42 @@ ALTER SEQUENCE log_entries_id_seq OWNED BY log_entries.id;
 
 
 --
+-- Name: looks; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE looks (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    exercise_id integer NOT NULL,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+ALTER TABLE public.looks OWNER TO exercism;
+
+--
+-- Name: looks_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE looks_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.looks_id_seq OWNER TO exercism;
+
+--
+-- Name: looks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE looks_id_seq OWNED BY looks.id;
+
+
+--
 -- Name: muted_submissions; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -726,6 +762,13 @@ ALTER TABLE ONLY log_entries ALTER COLUMN id SET DEFAULT nextval('log_entries_id
 -- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
 --
 
+ALTER TABLE ONLY looks ALTER COLUMN id SET DEFAULT nextval('looks_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
 ALTER TABLE ONLY muted_submissions ALTER COLUMN id SET DEFAULT nextval('muted_submissions_id_seq'::regclass);
 
 
@@ -843,6 +886,14 @@ ALTER TABLE ONLY likes
 
 ALTER TABLE ONLY log_entries
     ADD CONSTRAINT log_entries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: looks_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY looks
+    ADD CONSTRAINT looks_pkey PRIMARY KEY (id);
 
 
 --
@@ -1024,6 +1075,16 @@ CREATE INDEX index_users_on_username ON users USING btree (username);
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: kytrinyx
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM kytrinyx;
+GRANT ALL ON SCHEMA public TO kytrinyx;
+GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
 --
