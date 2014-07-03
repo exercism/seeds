@@ -1,6 +1,6 @@
 class User < OpenStruct
   def self.create(username, attributes={})
-    user = new({username: username}.merge(attributes))
+    user = new({username: username, email: "#{username}@example.com"}.merge(attributes))
     id = TARGET[:users].insert(user.to_h)
     user.id = id
     user
