@@ -7,6 +7,7 @@ class Submission < OpenStruct
       nit_count: 0,
       key: Key.submission,
       user_id: exercise.user_id,
+      user_exercise_id: exercise.id,
       created_at: at,
       updated_at: at,
       state: default_state(attributes[:state]),
@@ -23,14 +24,18 @@ class Submission < OpenStruct
     'pending'
   end
 
-  def self.done!
+  def pending?
+    state == 'pending'
+  end
+
+  def done!
     at = Timestamp.sometime_after(created_at)
     TARGET[:submissions].where(:id => id).update(:done_at => at, :state => 'done')
-    TARGET[:user_exercises].where(
-      language: language,
-      slug: slug,
-      user_id: user_id
-    ).update(:is_nitpicker => true, :state => 'done', :completed_at => at)
+    TARGET[:user_exercises].where(id: user_exercise_id).update(
+      :is_nitpicker => true,
+      :state => 'done',
+      :completed_at => at
+    )
     LifecycleEvent.track('completed', user_id, at)
   end
 end
