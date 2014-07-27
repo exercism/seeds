@@ -740,7 +740,8 @@ CREATE TABLE users (
     key character varying(255),
     mastery text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    onboarded_at timestamp without time zone
 );
 
 
@@ -1064,6 +1065,13 @@ CREATE UNIQUE INDEX by_submission ON submission_viewers USING btree (submission_
 --
 
 CREATE INDEX index_alerts_on_user_id ON alerts USING btree (user_id);
+
+
+--
+-- Name: index_lifecycle_events_on_user_id_and_key; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE INDEX index_lifecycle_events_on_user_id_and_key ON lifecycle_events USING btree (user_id, key);
 
 
 --
