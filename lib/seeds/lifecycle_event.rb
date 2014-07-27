@@ -4,6 +4,12 @@ class LifecycleEvent
       return
     end
 
-    TARGET[:lifecycle_events].insert(user_id: id, key: key, happened_at: at)
+    TARGET[:lifecycle_events].insert(
+      user_id: id,
+      key: key,
+      happened_at: at,
+      created_at: at,
+      updated_at: at
+    )
   end
 end
