@@ -44,38 +44,32 @@ namespace :seeds do
     require './lib/seeds'
     Reset.hard
 
-    alice = User.create('alice', mastery: Curriculum.languages.to_yaml)
-    charlie = User.create('charlie', mastery: ['ruby'].to_yaml)
-    diana = User.create('diana', mastery: ['javascript'].to_yaml)
-    eve = User.create('eve', mastery: ['python'].to_yaml)
-
+    ##
+    # users
+    ##
+    User.create('alice', mastery: Curriculum.languages.to_yaml)
+    User.create('bob', mastery: ['ruby', 'haskell'].to_yaml)
+    User.create('charlie', mastery: ['javascript', 'erlang', 'elixir'].to_yaml)
+    User.create('diana', mastery: ['python'].to_yaml)
     [
-      'amelie', 'beth', 'bob', 'claire', 'dawson', 'elisa', 'frederique', 'grace',
+      'amelie', 'beth', 'claire', 'dawson', 'eve', 'elisa', 'frederique', 'grace',
       'haley', 'isaac', 'jarrod', 'kieran', 'lisa', 'mack', 'madison', 'marshall',
       'mary', 'mia', 'mike', 'mildred', 'mitchell', 'morris', 'norma', 'opal',
       'paula', 'quentin', 'rachel', 'randall', 'rick', 'rita', 'river', 'rolf',
       'ruben', 'rudi', 'russ', 'ryan', 'shaina', 'talia', 'ursula', 'vince',
       'wilson', 'xavier', 'yvette', 'zachary'
     ].each do |username|
-      User.create username
+      user = User.create username
+
+      # some users joined, but then did nothing else
+      unless ["xavier", "eve", "claire", "rudi", "grace"].member?(username)
+        LifecycleEvent.track('fetched', user.id, Timestamp.soon_after(user.created_at))
+      end
     end
 
-    Sequence.create(100, 'bob')
-    Sequence.create(15, 'diana', 'javascript')
-    Sequence.create(15, 'eve', 'haskell')
-    [
-      'mary', 'morris', 'madison', 'mildred', 'mack', 'mike', 'mitchell', 'marshall',
-      'amelie', 'beth', 'claire', 'dawson', 'elisa', 'frederique', 'grace', 'haley',
-      'isaac', 'jarrod', 'kieran', 'lisa', 'mia', 'norma', 'opal', 'paula', 'quentin',
-      'ruben', 'shaina', 'talia', 'ursula', 'vince', 'wilson', 'xavier', 'yvette',
-      'zachary'
-    ].each do |username|
-      Sequence.create(20, username)
-    end
-    ['rachel', 'russ', 'rita', 'rolf', 'randall', 'river', 'rick', 'ryan'].each do |username|
-      Sequence.create(20, username, 'ruby')
-    end
-
+    ##
+    # teams
+    ##
     baconesia = Team.new('baconesia').save
     baconesia.managed_by 'alice', 'bob', 'charlie'
     baconesia.add 'mary', 'isaac', 'lisa', 'mia', 'elisa', 'claire', 'beth', 'paula', 'quentin', 'river'
@@ -115,11 +109,71 @@ namespace :seeds do
     polkadots.add 'bob', 'rudi', 'rachel'
     polkadots.invite 'ruben'
 
-    TARGET[:submissions].all.each do |attributes|
-      Comment.on(Submission.new(attributes))
+    submitted = ["lisa", "mike", "shaina", "morris", "vince"]
+    received_feedback = ["haley", "ryan", "amelie", "rick", "jarrod"]
+    completed = ["madison", "marshall", "river", "paula", "rita"]
+    commented = ["zachary", "mitchell", "beth", "mia", "kieran"]
+    onboarded = ["dawson", "elisa", "frederique", "isaac", "mary", "norma", "opal", "quentin", "randall", "ruben", "russ", "ursula", "wilson", "yvette"]
+    mastery = ["alice", "bob", "charlie", "diana"]
+    nitpickers = commented + onboarded + mastery
+
+    # Create submissions
+    (onboarded + commented + completed + received_feedback + submitted).each do |username|
+      user = User.find(username)
+
+      Some.times.each { |i|
+        ##
+        # source
+        ##
+        e = Source.random_exercise
+
+        next if Exercise.exists?(e, user)
+
+        sx = Source.submissions_in(e)
+        tsx = Chronology.random(sx.length+1, user.created_at)
+
+        ##
+        # destination
+        ##
+        exercise = Exercise.create(e, user, tsx.first)
+
+        sx.zip(tsx).each do |s, ts|
+          submission = Submission.create(s, exercise, ts)
+
+          if rand(3) == 0
+            # about 1/3 of the time, comment on your own submission first
+            Comment.on(submission, user.id, Timestamp.soon_after(submission.created_at))
+          end
+
+          if submission.pending? && nitpickers.member?(username)
+            if rand(5) > 1
+              submission.done!
+            end
+          end
+        end
+      }
     end
 
-    system("pg_dump -U exercism exercism_seeds -f db/seeds.sql")
+    ##
+    # discussions
+    ##
+
+    TARGET[:submissions].all.each do |attributes|
+      submission = Submission.new(attributes)
+      Discussion.about(submission, nitpickers)
+    end
+
+    commented.each do |username|
+      user = User.find(username)
+      scope = TARGET[:submissions].where("created_at > '#{user.created_at}' AND user_id != #{user.id}")
+      attributes = scope.limit(1, rand(scope.count)).first
+      puts attributes.inspect
+      next if attributes.nil?
+      submission = Submission.new(attributes)
+      Comment.on(submission, user.id, Timestamp.sometime_after(submission.created_at))
+    end
+
+    system("pg_dump -U exercism exercism_seeds --data-only --exclude-table=schema_migrations -f db/seeds.sql")
   end
 end
 

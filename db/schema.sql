@@ -106,6 +106,43 @@ ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
 
 
 --
+-- Name: lifecycle_events; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE lifecycle_events (
+    id integer NOT NULL,
+    user_id integer,
+    key character varying(255),
+    happened_at timestamp without time zone,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+ALTER TABLE public.lifecycle_events OWNER TO exercism;
+
+--
+-- Name: lifecycle_events_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE lifecycle_events_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.lifecycle_events_id_seq OWNER TO exercism;
+
+--
+-- Name: lifecycle_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE lifecycle_events_id_seq OWNED BY lifecycle_events.id;
+
+
+--
 -- Name: likes; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -748,6 +785,13 @@ ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
 --
 
+ALTER TABLE ONLY lifecycle_events ALTER COLUMN id SET DEFAULT nextval('lifecycle_events_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
 ALTER TABLE ONLY likes ALTER COLUMN id SET DEFAULT nextval('likes_id_seq'::regclass);
 
 
@@ -870,6 +914,14 @@ ALTER TABLE ONLY alerts
 
 ALTER TABLE ONLY comments
     ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: lifecycle_events_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY lifecycle_events
+    ADD CONSTRAINT lifecycle_events_pkey PRIMARY KEY (id);
 
 
 --
