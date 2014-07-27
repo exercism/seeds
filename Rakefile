@@ -115,7 +115,7 @@ namespace :seeds do
     commented = ["zachary", "mitchell", "beth", "mia", "kieran"]
     onboarded = ["dawson", "elisa", "frederique", "isaac", "mary", "norma", "opal", "quentin", "randall", "ruben", "russ", "ursula", "wilson", "yvette"]
     mastery = ["alice", "bob", "charlie", "diana"]
-    nitpickers = commented + onboarded + mastery
+    nitpickers = onboarded + mastery
 
     # Create submissions
     (onboarded + commented + completed + received_feedback + submitted).each do |username|
@@ -145,29 +145,27 @@ namespace :seeds do
             Comment.on(submission, user.id, Timestamp.soon_after(submission.created_at))
           end
 
-          if submission.pending? && nitpickers.member?(username)
-            if rand(5) > 1
+          if !submitted.member?(username)
+            Discussion.about(submission, nitpickers)
+          end
+
+          if submission.pending?
+            if completed.member?(username)
               submission.done!
+            end
+
+            if nitpickers.member?(username)
+              submission.done! if rand(3) > 0
             end
           end
         end
       }
     end
 
-    ##
-    # discussions
-    ##
-
-    TARGET[:submissions].all.each do |attributes|
-      submission = Submission.new(attributes)
-      Discussion.about(submission, nitpickers)
-    end
-
     commented.each do |username|
       user = User.find(username)
       scope = TARGET[:submissions].where("created_at > '#{user.created_at}' AND user_id != #{user.id}")
       attributes = scope.limit(1, rand(scope.count)).first
-      puts attributes.inspect
       next if attributes.nil?
       submission = Submission.new(attributes)
       Comment.on(submission, user.id, Timestamp.sometime_after(submission.created_at))
