@@ -171,6 +171,10 @@ namespace :seeds do
       Comment.on(submission, user.id, Timestamp.sometime_after(submission.created_at))
     end
 
+    TARGET[:submissions].all.each do |attributes|
+      Notification.process(Submission.new(attributes))
+    end
+
     system("pg_dump -U exercism exercism_seeds --data-only --exclude-table=schema_migrations -f db/seeds.sql")
   end
 end
