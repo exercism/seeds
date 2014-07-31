@@ -1138,12 +1138,12 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
--- Name: public; Type: ACL; Schema: -; Owner: kytrinyx
+-- Name: public; Type: ACL; Schema: -; Owner: exercism
 --
 
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
-REVOKE ALL ON SCHEMA public FROM kytrinyx;
-GRANT ALL ON SCHEMA public TO kytrinyx;
+REVOKE ALL ON SCHEMA public FROM exercism;
+GRANT ALL ON SCHEMA public TO exercism;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
