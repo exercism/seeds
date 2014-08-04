@@ -19,10 +19,7 @@ namespace :extract do
 
     db = Sequel.connect('postgres://exercism:@localhost/exercism_development')
 
-    usernames = db["SELECT DISTINCT language FROM user_exercises"].map {|row| row[:language]}
-
     languages = db["SELECT DISTINCT language FROM user_exercises"].map {|row| row[:language]}
-
     languages.each do |language|
       comments = db["SELECT comments.body FROM comments INNER JOIN submissions ON submissions.id=comments.submission_id WHERE submissions.language = '#{language}'"].map {|row| row[:body]}
       File.open("nitpicks/#{language}.dat", 'w') do |file|
@@ -47,6 +44,7 @@ namespace :seeds do
     ##
     # users
     ##
+    User.create('rikki-', avatar_url: "https://avatars.githubusercontent.com/u/8341419", github_id: 8341419)
     User.create('alice', mastery: Curriculum.languages.to_yaml)
     User.create('bob', mastery: ['ruby', 'haskell'].to_yaml)
     User.create('charlie', mastery: ['javascript', 'erlang', 'elixir'].to_yaml)
