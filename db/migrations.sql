@@ -57,6 +57,7 @@ COPY schema_migrations (version) FROM stdin;
 201407041409
 201407041604
 201407262200
+201409260723
 \.
 
 
