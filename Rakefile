@@ -3,8 +3,8 @@ namespace :generate do
   task :markov do
     Dir.glob("./nitpicks/*dat").each do |infile|
       language = infile[/([^\/]+)\.dat/, 1]
-      outfile = "./markov/#{language}.json"
-      system("bin/markov b -f #{infile} -o #{outfile}")
+      outfile = "./fixtures/markov/#{language}.json"
+      system("arkov b -f #{infile} -o #{outfile}")
     end
   end
 end
