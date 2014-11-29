@@ -173,6 +173,8 @@ namespace :seeds do
       Notification.process(Submission.new(attributes))
     end
 
+    system("arkov seed --dir=fixtures/markov")
+
     system("pg_dump -U exercism exercism_seeds --data-only --exclude-table=schema_migrations -f db/seeds.sql")
   end
 end
