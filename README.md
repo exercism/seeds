@@ -12,7 +12,7 @@ In order to create fake but real-ish data, this project:
 * creates fake users with nice avatars from the [uifaces](http://uifaces.com/)
   project
 * uses real (random) code examples from exercism.
-* [wip] fake nitpicks generated from markov chains using real exercism comments.
+* creates fake nitpicks generated from markov chains using real exercism comments.
 
 ## Usage
 
@@ -52,9 +52,4 @@ the underlying data structures that the nitpicks can be created from:
 ```
 rake generate:markov
 ```
-
-## TODO
-
-Must finish the part where it generates the fake comments and stores them back in place of the
-nitpick placeholder.
 

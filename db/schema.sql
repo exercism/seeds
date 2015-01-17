@@ -22,6 +22,20 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
+--
+-- Name: citext; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION citext; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION citext IS 'data type for case-insensitive character strings';
+
+
 SET search_path = public, pg_catalog;
 
 SET default_tablespace = '';
@@ -65,6 +79,44 @@ ALTER TABLE public.alerts_id_seq OWNER TO exercism;
 --
 
 ALTER SEQUENCE alerts_id_seq OWNED BY alerts.id;
+
+
+--
+-- Name: comment_threads; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE comment_threads (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    comment_id integer NOT NULL,
+    body text,
+    html_body text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+ALTER TABLE public.comment_threads OWNER TO exercism;
+
+--
+-- Name: comment_threads_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE comment_threads_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.comment_threads_id_seq OWNER TO exercism;
+
+--
+-- Name: comment_threads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE comment_threads_id_seq OWNED BY comment_threads.id;
 
 
 --
@@ -394,7 +446,8 @@ CREATE TABLE submissions (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     user_exercise_id integer,
-    filename character varying(255)
+    filename character varying(255),
+    solution text
 );
 
 
@@ -576,7 +629,7 @@ ALTER SEQUENCE user_exercises_id_seq OWNED BY user_exercises.id;
 
 CREATE TABLE users (
     id integer NOT NULL,
-    username character varying(255),
+    username citext,
     email character varying(255),
     avatar_url character varying(255),
     github_id integer,
@@ -616,6 +669,13 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 --
 
 ALTER TABLE ONLY alerts ALTER COLUMN id SET DEFAULT nextval('alerts_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
+ALTER TABLE ONLY comment_threads ALTER COLUMN id SET DEFAULT nextval('comment_threads_id_seq'::regclass);
 
 
 --
@@ -722,6 +782,14 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regcl
 
 ALTER TABLE ONLY alerts
     ADD CONSTRAINT alerts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: comment_threads_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY comment_threads
+    ADD CONSTRAINT comment_threads_pkey PRIMARY KEY (id);
 
 
 --
