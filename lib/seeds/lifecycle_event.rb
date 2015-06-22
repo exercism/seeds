@@ -3,6 +3,9 @@ class LifecycleEvent
     if TARGET[:lifecycle_events].where(user_id: id, key: key).count > 0
       return
     end
+    if at.nil?
+      raise "timestamp should never be null"
+    end
 
     TARGET[:lifecycle_events].insert(
       user_id: id,

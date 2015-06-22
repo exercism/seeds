@@ -3,7 +3,7 @@ class User < OpenStruct
     user = new({username: username, email: "#{username}@example.com"}.merge(attributes))
     id = TARGET[:users].insert(user.to_h)
     user.id = id
-    LifecycleEvent.track('joined', id, user.at)
+    LifecycleEvent.track('joined', id, user.created_at)
     user
   end
 
