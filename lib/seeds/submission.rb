@@ -3,7 +3,6 @@ class Submission < OpenStruct
     [:id, :is_liked, :done_at].each {|key|
       attributes.delete(key)
     }
-    puts attributes.inspect
     attributes.update(
       nit_count: 0,
       key: Key.submission,
