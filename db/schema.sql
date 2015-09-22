@@ -43,6 +43,43 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: acls; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE acls (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    language character varying NOT NULL,
+    slug character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.acls OWNER TO exercism;
+
+--
+-- Name: acls_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE acls_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.acls_id_seq OWNER TO exercism;
+
+--
+-- Name: acls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE acls_id_seq OWNED BY acls.id;
+
+
+--
 -- Name: alerts; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -50,11 +87,11 @@ CREATE TABLE alerts (
     id integer NOT NULL,
     user_id integer NOT NULL,
     text text,
-    url character varying(255),
-    link_text character varying(255),
+    url character varying,
+    link_text character varying,
     read boolean,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -91,8 +128,8 @@ CREATE TABLE comment_threads (
     comment_id integer NOT NULL,
     body text,
     html_body text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -164,10 +201,10 @@ ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
 CREATE TABLE lifecycle_events (
     id integer NOT NULL,
     user_id integer,
-    key character varying(255),
+    key character varying,
     happened_at timestamp without time zone,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -240,7 +277,7 @@ CREATE TABLE log_entries (
     body text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    key character varying(255)
+    key character varying
 );
 
 
@@ -275,8 +312,8 @@ CREATE TABLE looks (
     id integer NOT NULL,
     user_id integer NOT NULL,
     exercise_id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -347,12 +384,12 @@ CREATE TABLE notifications (
     id integer NOT NULL,
     user_id integer NOT NULL,
     item_id integer,
-    regarding character varying(255),
+    item_type character varying,
+    regarding character varying,
     read boolean,
     count integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    item_type character varying(255),
     creator_id integer
 );
 
@@ -385,7 +422,7 @@ ALTER SEQUENCE notifications_id_seq OWNED BY notifications.id;
 --
 
 CREATE TABLE schema_migrations (
-    version character varying(255) NOT NULL
+    version character varying NOT NULL
 );
 
 
@@ -434,19 +471,19 @@ ALTER SEQUENCE submission_viewers_id_seq OWNED BY submission_viewers.id;
 CREATE TABLE submissions (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    key character varying(255),
-    state character varying(255),
-    language character varying(255),
-    slug character varying(255),
+    key character varying,
+    state character varying,
+    language character varying,
+    slug character varying,
     code text,
     done_at timestamp without time zone,
     is_liked boolean,
     nit_count integer NOT NULL,
     version integer,
+    user_exercise_id integer,
+    filename character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    user_exercise_id integer,
-    filename character varying(255),
     solution text
 );
 
@@ -516,9 +553,10 @@ CREATE TABLE team_memberships (
     id integer NOT NULL,
     team_id integer NOT NULL,
     user_id integer NOT NULL,
+    confirmed boolean,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    confirmed boolean
+    inviter_id integer
 );
 
 
@@ -551,10 +589,10 @@ ALTER SEQUENCE team_memberships_id_seq OWNED BY team_memberships.id;
 
 CREATE TABLE teams (
     id integer NOT NULL,
-    slug character varying(255) NOT NULL,
+    slug character varying NOT NULL,
+    name character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    name character varying(255)
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -588,15 +626,20 @@ ALTER SEQUENCE teams_id_seq OWNED BY teams.id;
 CREATE TABLE user_exercises (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    language character varying(255),
-    slug character varying(255),
+    language character varying,
+    slug character varying,
     iteration_count integer,
-    state character varying(255),
+    state character varying,
     completed_at timestamp without time zone,
+    key character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    key character varying(255),
-    is_nitpicker boolean DEFAULT false
+    is_nitpicker boolean DEFAULT false,
+    archived boolean DEFAULT false,
+    last_iteration_at timestamp without time zone,
+    last_activity_at timestamp without time zone,
+    last_activity character varying,
+    fetched_at timestamp without time zone
 );
 
 
@@ -630,10 +673,10 @@ ALTER SEQUENCE user_exercises_id_seq OWNED BY user_exercises.id;
 CREATE TABLE users (
     id integer NOT NULL,
     username citext,
-    email character varying(255),
-    avatar_url character varying(255),
+    email character varying,
+    avatar_url character varying,
     github_id integer,
-    key character varying(255),
+    key character varying,
     mastery text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -662,6 +705,50 @@ ALTER TABLE public.users_id_seq OWNER TO exercism;
 --
 
 ALTER SEQUENCE users_id_seq OWNED BY users.id;
+
+
+--
+-- Name: views; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE views (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    exercise_id integer NOT NULL,
+    last_viewed_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.views OWNER TO exercism;
+
+--
+-- Name: views_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE views_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.views_id_seq OWNER TO exercism;
+
+--
+-- Name: views_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE views_id_seq OWNED BY views.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
+ALTER TABLE ONLY acls ALTER COLUMN id SET DEFAULT nextval('acls_id_seq'::regclass);
 
 
 --
@@ -774,6 +861,21 @@ ALTER TABLE ONLY user_exercises ALTER COLUMN id SET DEFAULT nextval('user_exerci
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
+ALTER TABLE ONLY views ALTER COLUMN id SET DEFAULT nextval('views_id_seq'::regclass);
+
+
+--
+-- Name: acls_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY acls
+    ADD CONSTRAINT acls_pkey PRIMARY KEY (id);
 
 
 --
@@ -905,10 +1007,25 @@ ALTER TABLE ONLY users
 
 
 --
+-- Name: views_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY views
+    ADD CONSTRAINT views_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: by_submission; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
 --
 
 CREATE UNIQUE INDEX by_submission ON submission_viewers USING btree (submission_id, viewer_id);
+
+
+--
+-- Name: index_acls_on_user_id_and_language_and_slug; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_acls_on_user_id_and_language_and_slug ON acls USING btree (user_id, language, slug);
 
 
 --
@@ -979,6 +1096,13 @@ CREATE UNIQUE INDEX index_user_exercises_on_user_id_and_language_and_slug ON use
 --
 
 CREATE INDEX index_users_on_username ON users USING btree (username);
+
+
+--
+-- Name: index_views_on_user_id_and_exercise_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_views_on_user_id_and_exercise_id ON views USING btree (user_id, exercise_id);
 
 
 --

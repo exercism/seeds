@@ -8,14 +8,15 @@ class Exercise < OpenStruct
     TARGET[:user_exercises].where(values).count > 0
   end
 
-  def self.create(attributes, user, at)
+  def self.create(attributes, user, at, active_at)
     [:id, :is_nitpicker, :completed_at].each {|key|
       attributes.delete(key)
     }
     attributes.update(
       user_id: user.id,
       key: Key.exercise,
-      state: 'pending',
+      last_iteration_at: active_at,
+      last_activity_at: active_at,
       created_at: at,
       updated_at: at,
     )

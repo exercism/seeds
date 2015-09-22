@@ -133,7 +133,7 @@ namespace :seeds do
         ##
         # destination
         ##
-        exercise = Exercise.create(e, user, tsx.first)
+        exercise = Exercise.create(e, user, tsx.first, tsx.last)
 
         sx.zip(tsx).each do |s, ts|
           submission = Submission.create(s, exercise, ts)
@@ -147,13 +147,13 @@ namespace :seeds do
             Discussion.about(submission, nitpickers)
           end
 
-          if submission.pending?
+          if rand(7) == 0
             if completed.member?(username)
-              submission.done!
+              submission.archive!
             end
 
             if nitpickers.member?(username)
-              submission.done! if rand(3) > 0
+              submission.archive! if rand(3) > 0
             end
           end
         end
