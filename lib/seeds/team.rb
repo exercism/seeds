@@ -34,7 +34,6 @@ class Team
       user = User.find(username)
       at = Chronology.random(1, at).first
       TARGET[:team_memberships].insert(user_id: user.id, team_id: id, confirmed: false, created_at: at, updated_at: at)
-      TeamInvitation.for(user, self)
     end
   end
 end
