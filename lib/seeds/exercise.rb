@@ -9,7 +9,7 @@ class Exercise < OpenStruct
   end
 
   def self.create(attributes, user, at, active_at)
-    [:id, :is_nitpicker, :completed_at].each {|key|
+    [:id].each {|key|
       attributes.delete(key)
     }
     attributes.update(

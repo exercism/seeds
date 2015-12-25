@@ -80,45 +80,6 @@ ALTER SEQUENCE acls_id_seq OWNED BY acls.id;
 
 
 --
--- Name: alerts; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE TABLE alerts (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    text text,
-    url character varying,
-    link_text character varying,
-    read boolean,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
-ALTER TABLE public.alerts OWNER TO exercism;
-
---
--- Name: alerts_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
---
-
-CREATE SEQUENCE alerts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.alerts_id_seq OWNER TO exercism;
-
---
--- Name: alerts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
---
-
-ALTER SEQUENCE alerts_id_seq OWNED BY alerts.id;
-
-
---
 -- Name: comment_threads; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -128,8 +89,8 @@ CREATE TABLE comment_threads (
     comment_id integer NOT NULL,
     body text,
     html_body text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -195,16 +156,145 @@ ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
 
 
 --
+-- Name: likes; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE likes (
+    id integer NOT NULL,
+    submission_id integer NOT NULL,
+    user_id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.likes OWNER TO exercism;
+
+--
+-- Name: submissions; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE submissions (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    key character varying(255),
+    state character varying(255),
+    language character varying(255),
+    slug character varying(255),
+    done_at timestamp without time zone,
+    is_liked boolean,
+    nit_count integer NOT NULL,
+    version integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    user_exercise_id integer,
+    solution text
+);
+
+
+ALTER TABLE public.submissions OWNER TO exercism;
+
+--
+-- Name: user_exercises; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE user_exercises (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    language character varying(255),
+    slug character varying(255),
+    iteration_count integer,
+    state character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    key character varying(255),
+    archived boolean DEFAULT false,
+    last_iteration_at timestamp without time zone,
+    last_activity_at timestamp without time zone,
+    last_activity character varying,
+    fetched_at timestamp without time zone,
+    skipped_at timestamp without time zone
+);
+
+
+ALTER TABLE public.user_exercises OWNER TO exercism;
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE users (
+    id integer NOT NULL,
+    username citext,
+    email character varying(255),
+    avatar_url character varying(255),
+    github_id integer,
+    key character varying(255),
+    mastery text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    onboarded_at timestamp without time zone
+);
+
+
+ALTER TABLE public.users OWNER TO exercism;
+
+--
+-- Name: dailies; Type: VIEW; Schema: public; Owner: exercism
+--
+
+CREATE VIEW dailies AS
+    SELECT acls.user_id, ue.key, u.username, ue.slug, ue.language, COALESCE(count(c.id), (0)::bigint) AS count FROM ((((acls JOIN user_exercises ue ON ((((ue.language)::text = (acls.language)::text) AND ((ue.slug)::text = (acls.slug)::text)))) JOIN submissions s ON ((ue.id = s.user_exercise_id))) JOIN users u ON ((u.id = ue.user_id))) LEFT JOIN comments c ON ((c.submission_id = s.id))) WHERE ((((NOT (ue.id IN (SELECT submissions.user_exercise_id FROM (comments JOIN submissions ON ((submissions.id = comments.submission_id))) WHERE (comments.user_id = acls.user_id) UNION SELECT submissions.user_exercise_id FROM (likes JOIN submissions ON ((submissions.id = likes.submission_id))) WHERE (likes.user_id = acls.user_id)))) AND (ue.archived = false)) AND ((ue.slug)::text <> 'hello-world'::text)) AND (ue.user_id <> acls.user_id)) GROUP BY acls.user_id, ue.key, u.username, ue.slug, ue.language ORDER BY COALESCE(count(c.id), (0)::bigint);
+
+
+ALTER TABLE public.dailies OWNER TO exercism;
+
+--
+-- Name: five_a_day_counts; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE five_a_day_counts (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    total integer NOT NULL,
+    day date NOT NULL
+);
+
+
+ALTER TABLE public.five_a_day_counts OWNER TO exercism;
+
+--
+-- Name: five_a_day_counts_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE five_a_day_counts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.five_a_day_counts_id_seq OWNER TO exercism;
+
+--
+-- Name: five_a_day_counts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE five_a_day_counts_id_seq OWNED BY five_a_day_counts.id;
+
+
+--
 -- Name: lifecycle_events; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
 
 CREATE TABLE lifecycle_events (
     id integer NOT NULL,
     user_id integer,
-    key character varying,
+    key character varying(255),
     happened_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
 );
 
 
@@ -230,21 +320,6 @@ ALTER TABLE public.lifecycle_events_id_seq OWNER TO exercism;
 
 ALTER SEQUENCE lifecycle_events_id_seq OWNED BY lifecycle_events.id;
 
-
---
--- Name: likes; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE TABLE likes (
-    id integer NOT NULL,
-    submission_id integer NOT NULL,
-    user_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
-ALTER TABLE public.likes OWNER TO exercism;
 
 --
 -- Name: likes_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
@@ -277,7 +352,7 @@ CREATE TABLE log_entries (
     body text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    key character varying
+    key character varying(255)
 );
 
 
@@ -305,78 +380,6 @@ ALTER SEQUENCE log_entries_id_seq OWNED BY log_entries.id;
 
 
 --
--- Name: looks; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE TABLE looks (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    exercise_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
-ALTER TABLE public.looks OWNER TO exercism;
-
---
--- Name: looks_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
---
-
-CREATE SEQUENCE looks_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.looks_id_seq OWNER TO exercism;
-
---
--- Name: looks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
---
-
-ALTER SEQUENCE looks_id_seq OWNED BY looks.id;
-
-
---
--- Name: muted_submissions; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE TABLE muted_submissions (
-    id integer NOT NULL,
-    submission_id integer NOT NULL,
-    user_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
-ALTER TABLE public.muted_submissions OWNER TO exercism;
-
---
--- Name: muted_submissions_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
---
-
-CREATE SEQUENCE muted_submissions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.muted_submissions_id_seq OWNER TO exercism;
-
---
--- Name: muted_submissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
---
-
-ALTER SEQUENCE muted_submissions_id_seq OWNED BY muted_submissions.id;
-
-
---
 -- Name: notifications; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -384,12 +387,12 @@ CREATE TABLE notifications (
     id integer NOT NULL,
     user_id integer NOT NULL,
     item_id integer,
-    item_type character varying,
-    regarding character varying,
+    regarding character varying(255),
     read boolean,
     count integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
+    item_type character varying(255),
     creator_id integer
 );
 
@@ -422,73 +425,11 @@ ALTER SEQUENCE notifications_id_seq OWNED BY notifications.id;
 --
 
 CREATE TABLE schema_migrations (
-    version character varying NOT NULL
+    version character varying(255) NOT NULL
 );
 
 
 ALTER TABLE public.schema_migrations OWNER TO exercism;
-
---
--- Name: submission_viewers; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE TABLE submission_viewers (
-    id integer NOT NULL,
-    submission_id integer NOT NULL,
-    viewer_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
-ALTER TABLE public.submission_viewers OWNER TO exercism;
-
---
--- Name: submission_viewers_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
---
-
-CREATE SEQUENCE submission_viewers_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.submission_viewers_id_seq OWNER TO exercism;
-
---
--- Name: submission_viewers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
---
-
-ALTER SEQUENCE submission_viewers_id_seq OWNED BY submission_viewers.id;
-
-
---
--- Name: submissions; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE TABLE submissions (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    key character varying,
-    state character varying,
-    language character varying,
-    slug character varying,
-    code text,
-    done_at timestamp without time zone,
-    is_liked boolean,
-    nit_count integer NOT NULL,
-    version integer,
-    user_exercise_id integer,
-    filename character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    solution text
-);
-
-
-ALTER TABLE public.submissions OWNER TO exercism;
 
 --
 -- Name: submissions_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
@@ -553,9 +494,9 @@ CREATE TABLE team_memberships (
     id integer NOT NULL,
     team_id integer NOT NULL,
     user_id integer NOT NULL,
-    confirmed boolean,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
+    confirmed boolean,
     inviter_id integer
 );
 
@@ -589,10 +530,10 @@ ALTER SEQUENCE team_memberships_id_seq OWNED BY team_memberships.id;
 
 CREATE TABLE teams (
     id integer NOT NULL,
-    slug character varying NOT NULL,
-    name character varying,
+    slug character varying(255) NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    name character varying(255)
 );
 
 
@@ -620,32 +561,6 @@ ALTER SEQUENCE teams_id_seq OWNED BY teams.id;
 
 
 --
--- Name: user_exercises; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE TABLE user_exercises (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    language character varying,
-    slug character varying,
-    iteration_count integer,
-    state character varying,
-    completed_at timestamp without time zone,
-    key character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    is_nitpicker boolean DEFAULT false,
-    archived boolean DEFAULT false,
-    last_iteration_at timestamp without time zone,
-    last_activity_at timestamp without time zone,
-    last_activity character varying,
-    fetched_at timestamp without time zone
-);
-
-
-ALTER TABLE public.user_exercises OWNER TO exercism;
-
---
 -- Name: user_exercises_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
 --
 
@@ -665,26 +580,6 @@ ALTER TABLE public.user_exercises_id_seq OWNER TO exercism;
 
 ALTER SEQUENCE user_exercises_id_seq OWNED BY user_exercises.id;
 
-
---
--- Name: users; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE TABLE users (
-    id integer NOT NULL,
-    username citext,
-    email character varying,
-    avatar_url character varying,
-    github_id integer,
-    key character varying,
-    mastery text,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    onboarded_at timestamp without time zone
-);
-
-
-ALTER TABLE public.users OWNER TO exercism;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
@@ -755,13 +650,6 @@ ALTER TABLE ONLY acls ALTER COLUMN id SET DEFAULT nextval('acls_id_seq'::regclas
 -- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
 --
 
-ALTER TABLE ONLY alerts ALTER COLUMN id SET DEFAULT nextval('alerts_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
---
-
 ALTER TABLE ONLY comment_threads ALTER COLUMN id SET DEFAULT nextval('comment_threads_id_seq'::regclass);
 
 
@@ -770,6 +658,13 @@ ALTER TABLE ONLY comment_threads ALTER COLUMN id SET DEFAULT nextval('comment_th
 --
 
 ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
+ALTER TABLE ONLY five_a_day_counts ALTER COLUMN id SET DEFAULT nextval('five_a_day_counts_id_seq'::regclass);
 
 
 --
@@ -797,28 +692,7 @@ ALTER TABLE ONLY log_entries ALTER COLUMN id SET DEFAULT nextval('log_entries_id
 -- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
 --
 
-ALTER TABLE ONLY looks ALTER COLUMN id SET DEFAULT nextval('looks_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
---
-
-ALTER TABLE ONLY muted_submissions ALTER COLUMN id SET DEFAULT nextval('muted_submissions_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
---
-
 ALTER TABLE ONLY notifications ALTER COLUMN id SET DEFAULT nextval('notifications_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
---
-
-ALTER TABLE ONLY submission_viewers ALTER COLUMN id SET DEFAULT nextval('submission_viewers_id_seq'::regclass);
 
 
 --
@@ -879,14 +753,6 @@ ALTER TABLE ONLY acls
 
 
 --
--- Name: alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
---
-
-ALTER TABLE ONLY alerts
-    ADD CONSTRAINT alerts_pkey PRIMARY KEY (id);
-
-
---
 -- Name: comment_threads_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -900,6 +766,14 @@ ALTER TABLE ONLY comment_threads
 
 ALTER TABLE ONLY comments
     ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: five_a_day_counts_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY five_a_day_counts
+    ADD CONSTRAINT five_a_day_counts_pkey PRIMARY KEY (id);
 
 
 --
@@ -927,35 +801,11 @@ ALTER TABLE ONLY log_entries
 
 
 --
--- Name: looks_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
---
-
-ALTER TABLE ONLY looks
-    ADD CONSTRAINT looks_pkey PRIMARY KEY (id);
-
-
---
--- Name: muted_submissions_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
---
-
-ALTER TABLE ONLY muted_submissions
-    ADD CONSTRAINT muted_submissions_pkey PRIMARY KEY (id);
-
-
---
 -- Name: notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
 --
 
 ALTER TABLE ONLY notifications
     ADD CONSTRAINT notifications_pkey PRIMARY KEY (id);
-
-
---
--- Name: submission_viewers_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
---
-
-ALTER TABLE ONLY submission_viewers
-    ADD CONSTRAINT submission_viewers_pkey PRIMARY KEY (id);
 
 
 --
@@ -1015,13 +865,6 @@ ALTER TABLE ONLY views
 
 
 --
--- Name: by_submission; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE UNIQUE INDEX by_submission ON submission_viewers USING btree (submission_id, viewer_id);
-
-
---
 -- Name: index_acls_on_user_id_and_language_and_slug; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -1029,10 +872,17 @@ CREATE UNIQUE INDEX index_acls_on_user_id_and_language_and_slug ON acls USING bt
 
 
 --
--- Name: index_alerts_on_user_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+-- Name: index_five_a_day_counts_on_user_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
 --
 
-CREATE INDEX index_alerts_on_user_id ON alerts USING btree (user_id);
+CREATE INDEX index_five_a_day_counts_on_user_id ON five_a_day_counts USING btree (user_id);
+
+
+--
+-- Name: index_five_a_day_counts_on_user_id_and_day; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_five_a_day_counts_on_user_id_and_day ON five_a_day_counts USING btree (user_id, day);
 
 
 --

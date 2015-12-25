@@ -17,9 +17,9 @@ class PeerGroup
 
   def participants
     criteria = {
-      language: submission.language, slug: submission.slug, is_nitpicker: true
+      language: submission.language, slug: submission.slug
     }
-    TARGET[:user_exercises].where(criteria).where("completed_at < '#{at}'").select(:user_id).all
+    TARGET[:user_exercises].where(criteria).where("created_at < '#{at}'").select(:user_id).all
   end
 
   def managers
