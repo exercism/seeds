@@ -45,10 +45,10 @@ namespace :seeds do
     # users
     ##
     User.create('rikki-', avatar_url: "https://avatars.githubusercontent.com/u/8341419", github_id: 8341419)
-    User.create('alice', mastery: Curriculum.languages.to_yaml)
-    User.create('bob', mastery: ['ruby', 'haskell'].to_yaml)
-    User.create('charlie', mastery: ['javascript', 'erlang', 'elixir'].to_yaml)
-    User.create('diana', mastery: ['python'].to_yaml)
+    User.create('alice', track_mentor: Curriculum.languages.to_yaml)
+    User.create('bob', track_mentor: ['ruby', 'haskell'].to_yaml)
+    User.create('charlie', track_mentor: ['javascript', 'erlang', 'elixir'].to_yaml)
+    User.create('diana', track_mentor: ['python'].to_yaml)
     [
       'amelie', 'beth', 'claire', 'dawson', 'eve', 'elisa', 'frederique', 'grace',
       'haley', 'isaac', 'jarrod', 'kieran', 'lisa', 'mack', 'madison', 'marshall',
@@ -112,8 +112,8 @@ namespace :seeds do
     completed = ["madison", "marshall", "river", "paula", "rita"]
     commented = ["zachary", "mitchell", "beth", "mia", "kieran"]
     onboarded = ["dawson", "elisa", "frederique", "isaac", "mary", "norma", "opal", "quentin", "randall", "ruben", "russ", "ursula", "wilson", "yvette"]
-    mastery = ["alice", "bob", "charlie", "diana"]
-    nitpickers = onboarded + mastery
+    track_mentor = ["alice", "bob", "charlie", "diana"]
+    nitpickers = onboarded + track_mentor
 
     # Create submissions
     (onboarded + commented + completed + received_feedback + submitted).each do |username|
@@ -180,4 +180,3 @@ namespace :seeds do
 end
 
 task default: "seeds:generate"
-

@@ -27,7 +27,7 @@ class User < OpenStruct
       github_id: GitHub.id,
       created_at: at,
       updated_at: at,
-      mastery: [].to_yaml,
+      track_mentor: [].to_yaml,
       avatar_url: Avatar.random
     }
   end
