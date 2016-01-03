@@ -233,7 +233,8 @@ CREATE TABLE users (
     mastery text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    onboarded_at timestamp without time zone
+    onboarded_at timestamp without time zone,
+    track_mentor text
 );
 
 
@@ -244,16 +245,16 @@ ALTER TABLE public.users OWNER TO exercism;
 --
 
 CREATE VIEW dailies AS
-    SELECT acls.user_id, ue.key, u.username, ue.slug, ue.language, COALESCE(count(c.id), (0)::bigint) AS count FROM ((((acls JOIN user_exercises ue ON ((((ue.language)::text = (acls.language)::text) AND ((ue.slug)::text = (acls.slug)::text)))) JOIN submissions s ON ((ue.id = s.user_exercise_id))) JOIN users u ON ((u.id = ue.user_id))) LEFT JOIN comments c ON ((c.submission_id = s.id))) WHERE ((((NOT (ue.id IN (SELECT submissions.user_exercise_id FROM (comments JOIN submissions ON ((submissions.id = comments.submission_id))) WHERE (comments.user_id = acls.user_id) UNION SELECT submissions.user_exercise_id FROM (likes JOIN submissions ON ((submissions.id = likes.submission_id))) WHERE (likes.user_id = acls.user_id)))) AND (ue.archived = false)) AND ((ue.slug)::text <> 'hello-world'::text)) AND (ue.user_id <> acls.user_id)) GROUP BY acls.user_id, ue.key, u.username, ue.slug, ue.language ORDER BY COALESCE(count(c.id), (0)::bigint);
+    SELECT acls.user_id, ue.key, u.username, ue.slug, ue.language, COALESCE(count(c.id), (0)::bigint) AS count, ucl.user_exercise_id FROM (((((acls JOIN user_exercises ue ON ((((ue.language)::text = (acls.language)::text) AND ((ue.slug)::text = (acls.slug)::text)))) JOIN submissions s ON ((ue.id = s.user_exercise_id))) JOIN users u ON ((u.id = ue.user_id))) LEFT JOIN comments c ON ((c.submission_id = s.id))) LEFT JOIN (SELECT submissions.user_exercise_id, comments.user_id FROM (comments JOIN submissions ON ((submissions.id = comments.submission_id))) UNION SELECT submissions.user_exercise_id, likes.user_id FROM (likes JOIN submissions ON ((submissions.id = likes.submission_id)))) ucl ON (((ucl.user_id = acls.user_id) AND (ue.id = ucl.user_exercise_id)))) WHERE (((((ue.archived = false) AND ((ue.slug)::text <> 'hello-world'::text)) AND (ue.user_id <> acls.user_id)) AND (ue.last_iteration_at > (now() - '30 days'::interval))) AND (ucl.user_exercise_id IS NULL)) GROUP BY acls.user_id, ue.key, u.username, ue.slug, ue.language, ucl.user_exercise_id ORDER BY COALESCE(count(c.id), (0)::bigint);
 
 
 ALTER TABLE public.dailies OWNER TO exercism;
 
 --
--- Name: five_a_day_counts; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+-- Name: daily_counts; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
 
-CREATE TABLE five_a_day_counts (
+CREATE TABLE daily_counts (
     id integer NOT NULL,
     user_id integer NOT NULL,
     total integer NOT NULL,
@@ -261,13 +262,13 @@ CREATE TABLE five_a_day_counts (
 );
 
 
-ALTER TABLE public.five_a_day_counts OWNER TO exercism;
+ALTER TABLE public.daily_counts OWNER TO exercism;
 
 --
--- Name: five_a_day_counts_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+-- Name: daily_counts_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
 --
 
-CREATE SEQUENCE five_a_day_counts_id_seq
+CREATE SEQUENCE daily_counts_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -275,13 +276,13 @@ CREATE SEQUENCE five_a_day_counts_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.five_a_day_counts_id_seq OWNER TO exercism;
+ALTER TABLE public.daily_counts_id_seq OWNER TO exercism;
 
 --
--- Name: five_a_day_counts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+-- Name: daily_counts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
 --
 
-ALTER SEQUENCE five_a_day_counts_id_seq OWNED BY five_a_day_counts.id;
+ALTER SEQUENCE daily_counts_id_seq OWNED BY daily_counts.id;
 
 
 --
@@ -664,7 +665,7 @@ ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
 --
 
-ALTER TABLE ONLY five_a_day_counts ALTER COLUMN id SET DEFAULT nextval('five_a_day_counts_id_seq'::regclass);
+ALTER TABLE ONLY daily_counts ALTER COLUMN id SET DEFAULT nextval('daily_counts_id_seq'::regclass);
 
 
 --
@@ -769,11 +770,11 @@ ALTER TABLE ONLY comments
 
 
 --
--- Name: five_a_day_counts_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+-- Name: daily_counts_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
 --
 
-ALTER TABLE ONLY five_a_day_counts
-    ADD CONSTRAINT five_a_day_counts_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY daily_counts
+    ADD CONSTRAINT daily_counts_pkey PRIMARY KEY (id);
 
 
 --
@@ -872,17 +873,24 @@ CREATE UNIQUE INDEX index_acls_on_user_id_and_language_and_slug ON acls USING bt
 
 
 --
--- Name: index_five_a_day_counts_on_user_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+-- Name: index_comments_on_submission_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
 --
 
-CREATE INDEX index_five_a_day_counts_on_user_id ON five_a_day_counts USING btree (user_id);
+CREATE INDEX index_comments_on_submission_id ON comments USING btree (submission_id);
 
 
 --
--- Name: index_five_a_day_counts_on_user_id_and_day; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+-- Name: index_daily_counts_on_user_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_five_a_day_counts_on_user_id_and_day ON five_a_day_counts USING btree (user_id, day);
+CREATE INDEX index_daily_counts_on_user_id ON daily_counts USING btree (user_id);
+
+
+--
+-- Name: index_daily_counts_on_user_id_and_day; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_daily_counts_on_user_id_and_day ON daily_counts USING btree (user_id, day);
 
 
 --
