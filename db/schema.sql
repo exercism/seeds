@@ -230,11 +230,11 @@ CREATE TABLE users (
     avatar_url character varying(255),
     github_id integer,
     key character varying(255),
-    mastery text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     onboarded_at timestamp without time zone,
-    track_mentor text
+    track_mentor text,
+    joined_as character varying
 );
 
 
