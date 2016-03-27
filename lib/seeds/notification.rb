@@ -21,14 +21,12 @@ class Notification < SimpleDelegator
 
     def attributes
       {
-        "item_id" => id,
-        "regarding" => "code",
         "read" => read?,
-        "count" => 1,
+        "action" => "code",
+        "actor_id" => user_id,
+        "iteration_id" => id,
         "created_at" => created_at,
         "updated_at" => created_at,
-        "item_type" => "Submission",
-        "creator_id" => user_id
       }
     end
 

@@ -80,44 +80,6 @@ ALTER SEQUENCE acls_id_seq OWNED BY acls.id;
 
 
 --
--- Name: comment_threads; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE TABLE comment_threads (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    comment_id integer NOT NULL,
-    body text,
-    html_body text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
-ALTER TABLE public.comment_threads OWNER TO exercism;
-
---
--- Name: comment_threads_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
---
-
-CREATE SEQUENCE comment_threads_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.comment_threads_id_seq OWNER TO exercism;
-
---
--- Name: comment_threads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
---
-
-ALTER SEQUENCE comment_threads_id_seq OWNED BY comment_threads.id;
-
-
---
 -- Name: comments; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -153,6 +115,42 @@ ALTER TABLE public.comments_id_seq OWNER TO exercism;
 --
 
 ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
+
+--
+-- Name: conversation_subscriptions; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE conversation_subscriptions (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    solution_id integer NOT NULL,
+    subscribed boolean DEFAULT true,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.conversation_subscriptions OWNER TO exercism;
+
+--
+-- Name: conversation_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE conversation_subscriptions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.conversation_subscriptions_id_seq OWNER TO exercism;
+
+--
+-- Name: conversation_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE conversation_subscriptions_id_seq OWNED BY conversation_subscriptions.id;
 
 
 --
@@ -234,7 +232,10 @@ CREATE TABLE users (
     updated_at timestamp without time zone NOT NULL,
     onboarded_at timestamp without time zone,
     track_mentor text,
-    joined_as character varying
+    joined_as character varying,
+    api_secret character varying,
+    api_key character varying,
+    share_key character varying
 );
 
 
@@ -283,6 +284,42 @@ ALTER TABLE public.daily_counts_id_seq OWNER TO exercism;
 --
 
 ALTER SEQUENCE daily_counts_id_seq OWNED BY daily_counts.id;
+
+
+--
+-- Name: deleted_iterations; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE TABLE deleted_iterations (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    submission_id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.deleted_iterations OWNER TO exercism;
+
+--
+-- Name: deleted_iterations_id_seq; Type: SEQUENCE; Schema: public; Owner: exercism
+--
+
+CREATE SEQUENCE deleted_iterations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.deleted_iterations_id_seq OWNER TO exercism;
+
+--
+-- Name: deleted_iterations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: exercism
+--
+
+ALTER SEQUENCE deleted_iterations_id_seq OWNED BY deleted_iterations.id;
 
 
 --
@@ -387,14 +424,13 @@ ALTER SEQUENCE log_entries_id_seq OWNED BY log_entries.id;
 CREATE TABLE notifications (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    item_id integer,
-    regarding character varying(255),
     read boolean,
-    count integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    item_type character varying(255),
-    creator_id integer
+    action character varying,
+    actor_id integer,
+    solution_id integer,
+    iteration_id integer
 );
 
 
@@ -651,13 +687,6 @@ ALTER TABLE ONLY acls ALTER COLUMN id SET DEFAULT nextval('acls_id_seq'::regclas
 -- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
 --
 
-ALTER TABLE ONLY comment_threads ALTER COLUMN id SET DEFAULT nextval('comment_threads_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
---
-
 ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq'::regclass);
 
 
@@ -665,7 +694,28 @@ ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
 --
 
+ALTER TABLE ONLY conversation_notifications ALTER COLUMN id SET DEFAULT nextval('conversation_notifications_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
+ALTER TABLE ONLY conversation_subscriptions ALTER COLUMN id SET DEFAULT nextval('conversation_subscriptions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
 ALTER TABLE ONLY daily_counts ALTER COLUMN id SET DEFAULT nextval('daily_counts_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
+--
+
+ALTER TABLE ONLY deleted_iterations ALTER COLUMN id SET DEFAULT nextval('deleted_iterations_id_seq'::regclass);
 
 
 --
@@ -754,14 +804,6 @@ ALTER TABLE ONLY acls
 
 
 --
--- Name: comment_threads_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
---
-
-ALTER TABLE ONLY comment_threads
-    ADD CONSTRAINT comment_threads_pkey PRIMARY KEY (id);
-
-
---
 -- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -770,11 +812,35 @@ ALTER TABLE ONLY comments
 
 
 --
+-- Name: conversation_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY conversation_notifications
+    ADD CONSTRAINT conversation_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: conversation_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY conversation_subscriptions
+    ADD CONSTRAINT conversation_subscriptions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: daily_counts_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
 --
 
 ALTER TABLE ONLY daily_counts
     ADD CONSTRAINT daily_counts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: deleted_iterations_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
+--
+
+ALTER TABLE ONLY deleted_iterations
+    ADD CONSTRAINT deleted_iterations_pkey PRIMARY KEY (id);
 
 
 --
@@ -880,6 +946,41 @@ CREATE INDEX index_comments_on_submission_id ON comments USING btree (submission
 
 
 --
+-- Name: index_conversation_notifications_on_user_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE INDEX index_conversation_notifications_on_user_id ON conversation_notifications USING btree (user_id);
+
+
+--
+-- Name: index_conversation_subscriptions_on_solution_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE INDEX index_conversation_subscriptions_on_solution_id ON conversation_subscriptions USING btree (solution_id);
+
+
+--
+-- Name: index_conversation_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE INDEX index_conversation_subscriptions_on_user_id ON conversation_subscriptions USING btree (user_id);
+
+
+--
+-- Name: index_conversation_subscriptions_on_user_solution; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_conversation_subscriptions_on_user_solution ON conversation_subscriptions USING btree (user_id, solution_id);
+
+
+--
+-- Name: index_conversation_subscriptions_on_user_submission; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_conversation_subscriptions_on_user_submission ON deleted_iterations USING btree (user_id, submission_id);
+
+
+--
 -- Name: index_daily_counts_on_user_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
 --
 
@@ -894,10 +995,31 @@ CREATE UNIQUE INDEX index_daily_counts_on_user_id_and_day ON daily_counts USING 
 
 
 --
+-- Name: index_deleted_iterations_on_submission_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE INDEX index_deleted_iterations_on_submission_id ON deleted_iterations USING btree (submission_id);
+
+
+--
+-- Name: index_deleted_iterations_on_user_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE INDEX index_deleted_iterations_on_user_id ON deleted_iterations USING btree (user_id);
+
+
+--
 -- Name: index_lifecycle_events_on_user_id_and_key; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
 --
 
 CREATE INDEX index_lifecycle_events_on_user_id_and_key ON lifecycle_events USING btree (user_id, key);
+
+
+--
+-- Name: index_notifications_on_user_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
+--
+
+CREATE INDEX index_notifications_on_user_id ON notifications USING btree (user_id);
 
 
 --
