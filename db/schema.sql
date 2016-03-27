@@ -116,6 +116,7 @@ ALTER TABLE public.comments_id_seq OWNER TO exercism;
 
 ALTER SEQUENCE comments_id_seq OWNED BY comments.id;
 
+
 --
 -- Name: conversation_subscriptions; Type: TABLE; Schema: public; Owner: exercism; Tablespace: 
 --
@@ -694,13 +695,6 @@ ALTER TABLE ONLY comments ALTER COLUMN id SET DEFAULT nextval('comments_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
 --
 
-ALTER TABLE ONLY conversation_notifications ALTER COLUMN id SET DEFAULT nextval('conversation_notifications_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: exercism
---
-
 ALTER TABLE ONLY conversation_subscriptions ALTER COLUMN id SET DEFAULT nextval('conversation_subscriptions_id_seq'::regclass);
 
 
@@ -809,14 +803,6 @@ ALTER TABLE ONLY acls
 
 ALTER TABLE ONLY comments
     ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
-
-
---
--- Name: conversation_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: exercism; Tablespace: 
---
-
-ALTER TABLE ONLY conversation_notifications
-    ADD CONSTRAINT conversation_notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -943,13 +929,6 @@ CREATE UNIQUE INDEX index_acls_on_user_id_and_language_and_slug ON acls USING bt
 --
 
 CREATE INDEX index_comments_on_submission_id ON comments USING btree (submission_id);
-
-
---
--- Name: index_conversation_notifications_on_user_id; Type: INDEX; Schema: public; Owner: exercism; Tablespace: 
---
-
-CREATE INDEX index_conversation_notifications_on_user_id ON conversation_notifications USING btree (user_id);
 
 
 --
