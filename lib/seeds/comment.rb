@@ -9,11 +9,6 @@ class Comment
     }
     TARGET[:comments].insert(attributes)
 
-    if submission.user_id != user_id
-      LifecycleEvent.track('received_feedback', submission.user_id, at)
-      LifecycleEvent.track('commented', user_id, at)
-    end
-
     sql = <<-SQL
     SELECT commented_at FROM
     (
@@ -33,6 +28,5 @@ class Comment
 
     at = result[:commented_at]
     TARGET[:users].where(id: user_id).update(onboarded_at: at)
-    LifecycleEvent.track('onboarded', user_id, at)
   end
 end

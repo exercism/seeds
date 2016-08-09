@@ -58,11 +58,6 @@ namespace :seeds do
       'wilson', 'xavier', 'yvette', 'zachary'
     ].each do |username|
       user = User.create username
-
-      # some users joined, but then did nothing else
-      unless ["xavier", "eve", "claire", "rudi", "grace"].member?(username)
-        LifecycleEvent.track('fetched', user.id, Timestamp.soon_after(user.created_at))
-      end
     end
 
     ##
