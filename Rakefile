@@ -61,33 +61,44 @@ namespace :seeds do
     end
 
     ##
+    # tags
+    ##
+    ruby = Tag.new('ruby').save
+    elixir = Tag.new('elixir').save
+    go = Tag.new('go').save
+    rust = Tag.new('rust').save
+    haskell = Tag.new('haskell').save
+    python = Tag.new('python').save
+    javascript = Tag.new('javascript').save
+
+    ##
     # teams
     ##
-    baconesia = Team.new('baconesia').save
+    baconesia = Team.new('baconesia').set_tags('ruby', 'elixir').save
     baconesia.managed_by 'alice', 'bob', 'charlie'
     baconesia.add 'mary', 'isaac', 'lisa', 'mia', 'elisa', 'claire', 'beth', 'paula', 'quentin', 'river'
     baconesia.invite 'jarrod', 'kieran', 'opal', 'rachel', 'ruben', 'shaina', 'talia', 'xavier'
 
-    chocolades = Team.new('chocolades').save
+    chocolades = Team.new('chocolades').set_tags('elixir', 'go').save
     chocolades.managed_by 'alice'
     chocolades.add 'bob', 'river', 'quentin', 'xavier'
     chocolades.invite 'mack', 'ruben'
 
-    ghost = Team.new('ghost').save
+    ghost = Team.new('ghost').set_tags('go', 'rust').save
     ghost.managed_by 'alice'
     ghost.invite 'ruben', 'bob'
 
-    motley = Team.new('motley').save
+    motley = Team.new('motley').set_tags('rust', 'haskell').save
     motley.managed_by 'alice', 'bob'
     motley.add 'bob', 'rachel', 'mary', 'morris', 'madison', 'mildred', 'mack', 'mike', 'mitchell', 'marshall'
     motley.invite 'ruben', 'frederique', 'haley'
 
-    rugrats = Team.new('rugrats').save
+    rugrats = Team.new('rugrats').set_tags('haskell', 'python').save
     rugrats.managed_by 'charlie'
     rugrats.add 'rachel', 'russ', 'rita', 'rolf', 'randall', 'river', 'rick', 'rudi'
     rugrats.invite 'ryan', 'ruben', 'bob'
 
-    slate = Team.new('slate').save
+    slate = Team.new('slate').set_tags('python', 'javascript').save
     slate.managed_by 'bob'
     members = [
       'amelie', 'beth', 'claire', 'dawson', 'elisa', 'frederique', 'grace', 'haley',
