@@ -1,12 +1,21 @@
+require 'sequel/extensions/pg_array'
+
 class Team
-  attr_reader :name, :at, :id
-  def initialize(name)
+  attr_reader :name, :public, :tags, :at, :id
+  def initialize(name, public = true)
     @name = name
+    @public = public
+    @tags = []
     @at = Timestamp.random
   end
 
   def attributes
-    {created_at: at, updated_at: at, slug: name, name: name}
+    {created_at: at, updated_at: at, slug: name, name: name, public: public, tags: tags}
+  end
+
+  def set_tags(*tags)
+    @tags = Sequel.pg_array(TARGET[:tags].where(name: tags).map(:id))
+    self
   end
 
   def save
