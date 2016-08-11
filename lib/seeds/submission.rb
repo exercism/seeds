@@ -13,13 +13,11 @@ class Submission < OpenStruct
     )
     id = TARGET[:submissions].insert(attributes)
     attributes[:id] = id
-    LifecycleEvent.track('submitted', exercise.user_id, at)
     ACL.authorize(exercise.user_id, exercise.language, exercise.slug, at)
     new attributes
   end
 
   def archive!
     TARGET[:user_exercises].where(id: user_exercise_id).update(:archived => true)
-    LifecycleEvent.track('completed', user_id, Timestamp.sometime_after(created_at))
   end
 end
